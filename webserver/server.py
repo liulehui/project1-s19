@@ -16,6 +16,7 @@ Read about it online.
 """
 
 import os
+
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response
@@ -120,7 +121,8 @@ def index():
   #
   # example of a database query
   #
-  cursor = g.conn.execute("SELECT name FROM test")
+  # cursor = g.conn.execute("SELECT name FROM test")
+  cursor = g.conn.execute("select lastname FROM players")
   names = []
   for result in cursor:
     names.append(result['name'])  # can also be accessed using result[0]

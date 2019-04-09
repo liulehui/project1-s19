@@ -125,7 +125,7 @@ def index():
   cursor = g.conn.execute("select last_name FROM players")
   names = []
   for result in cursor:
-    names.append(result['name'])  # can also be accessed using result[0]
+    names.append(result['last_name'])  # can also be accessed using result[0]
   cursor.close()
 
   #

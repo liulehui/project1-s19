@@ -206,6 +206,7 @@ limit 10;"""
         title="ranking",
         top_10 = top_10)
 
+@app.route("/ranking/<int:user_id>")
 
 if __name__ == "__main__":
   import click

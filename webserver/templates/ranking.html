@@ -4,7 +4,12 @@
   <h3>This is the ranking page.</h3>
   <br>
   <p>Below is the top 10 players on the ranking board.</p>
-<table>
+<table id = 'ranking'>
+    <thead>
+    <th>Name</th>
+    <th>Score</th>
+    <th>Ranking</th>
+</thead>
 {% for item in top_10 %}
 <TR>
    <TD class="name">{{item.name}}</TD>

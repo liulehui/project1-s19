@@ -16,7 +16,7 @@ Read about it online.
 """
 
 import os
-
+import time
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response
@@ -129,31 +129,6 @@ def index():
   cursor.close()
 
   #
-  # Flask uses Jinja templates, which is an extension to HTML where you can
-  # pass data to a template and dynamically generate HTML based on the data
-  # (you can think of it as simple PHP)
-  # documentation: https://realpython.com/blog/python/primer-on-jinja-templating/
-  #
-  # You can see an example template in templates/index.html
-  #
-  # context are the variables that are passed to the template.
-  # for example, "data" key in the context variable defined below will be 
-  # accessible as a variable in index.html:
-  #
-  #     # will print: [u'grace hopper', u'alan turing', u'ada lovelace']
-  #     <div>{{data}}</div>
-  #     
-  #     # creates a <div> tag for each element in data
-  #     # will print: 
-  #     #
-  #     #   <div>grace hopper</div>
-  #     #   <div>alan turing</div>
-  #     #   <div>ada lovelace</div>
-  #     #
-  #     {% for n in data %}
-  #     <div>{{n}}</div>
-  #     {% endfor %}
-  #
   context = dict(data = names)
 
 
@@ -161,14 +136,14 @@ def index():
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
   #
-  return render_template("index.html", **context)
+  return render_template("introduction.html", names = names,title = 'Landing Page')
 
 #
 # This is an example of a different path.  You can see it at
 # 
 #     localhost:8111/another
 #
-# notice that the functio name is another() rather than index()
+# notice that the function name is another() rather than index()
 # the functions for each app.route needs to have different names
 #
 @app.route('/another')
@@ -185,11 +160,51 @@ def add():
   g.conn.execute(text(cmd), name1 = name, name2 = name);
   return redirect('/')
 
+#
+# @app.route('/login')
+# def login():
+#     abort(401)
+#     this_is_never_executed()
 
-@app.route('/login')
-def login():
-    abort(401)
-    this_is_never_executed()
+
+@app.route("/matches")
+def matches():
+    return render_template(
+        'matches.html', my_string="Wheeeee!",
+        title="matches",
+
+        names = ['Federer', 'Nadal','Lehui', 'Djokovic', 'Murray', \
+                 'Wawrinka', 'Coric', 'del Potro', 'Cilic', 'Dimitrov', 'Thiem', 'Sock'])
+
+
+@app.route("/players")
+def players():
+    return render_template(
+        'players.html', my_string="Wheeeee!",
+        title="players",names = ['Federer', 'Nadal','Lehui Liu', 'Djokovic', 'Murray', 'Wawrinka', 'Coric',\
+                                 'del Potro', 'Cilic', 'Dimitrov', 'Thiem', 'Sock'])
+
+
+@app.route("/ranking")
+def ranking():
+    sql_query = """with tmp as
+(select pid,max(date) from history_score group by pid)
+select tmp.pid,tmp.max,score,rank() over (order by score DESC) from history_score, tmp
+where history_score.pid = tmp.pid
+and history_score.date = tmp.max
+limit 10;"""
+    cursor = g.conn.execute(sql_query)
+
+    # find the top 10 players on the ranking board
+    top_10 = []
+    for result in cursor:
+        player = {'name': result['pid'], 'score': result['score'], 'rank': result['rank']}
+        top_10.append(player)
+
+    return render_template(
+        'ranking.html',
+        title="ranking",
+        top_10 = top_10)
 
 
 if __name__ == "__main__":

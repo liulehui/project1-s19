@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block content %}
+  <h2> Welcome To Tennis Stat!</h2>
+  <h3>This is the ranking page.</h3>
+  <br>
+  <p>Below is the top 10 players on the ranking board.</p>
+<table>
+{% for item in top_10 %}
+<TR>
+   <TD class="name">{{item.name}}</TD>
+   <TD class="score">{{item.score}}</TD>
+   <TD class="ranking">{{item.rank}}</TD>
+</TR>
+{% endfor %}
+</table>
+
+  <!--<h3> This is the end of my child template</h3>-->
+{% endblock %}

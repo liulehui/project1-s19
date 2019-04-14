@@ -25,10 +25,10 @@ df_columns = list(df)
 columns = ",".join(df_columns)
 
 print(df.shape)
-
+exception = 0
 # iteration each row to insert into database
-for index,row in tqdm(df.iterrows()):
-    print(index)
+for index,row in tqdm(df.iterrows(),total=df.shape[0]):
+    # print(index)
     match_id = row['match_id']
     # print(match_id)
     t_id = row['t_id']
@@ -92,7 +92,7 @@ for index,row in tqdm(df.iterrows()):
 
     cmd = """INSERT INTO matches VALUES (\'{}\',{},{},{},\'{}\',{},{},{},{},
     {},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},
-    {},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}""".format(
+    {},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{})""".format(
         match_id,t_id, year, duration,level, winner_sets_won,loser_sets_won,winner_games_won,loser_games_won,
         winner_aces, winner_double_faults,
         winner_first_serves_in, winner_first_serves_total,winner_first_serve_points_won, winner_first_serve_points_total,
@@ -118,13 +118,17 @@ for index,row in tqdm(df.iterrows()):
         loser_return_points_won, loser_return_points_total,
         loser_total_points_won, loser_total_points_total,
     )
+    # print(cmd)
 
     # cmd = 'INSERT INTO players VALUES (\'{}\',\'{}\',\'{}\',\'{}\',{},{},\'{}\',\'{}\',{})'\
     #     .format(id,last_name,first_name,birthday,height,weight, Nationality,play_type,start_pro)
-    # try:
-    #     conn.execute(cmd)
-    #     print("success!")
-    # except Exception as e:
-    #     print(Exception)
-    #     pass
+
+    try:
+        conn.execute(cmd)
+        print("success!")
+    except Exception as e:
+        exception += 1
+        print(Exception)
+        pass
+print(exception)
 conn.close()

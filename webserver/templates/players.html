@@ -3,8 +3,8 @@
   <h2>Players Page</h2>
 
   <ul>
-    {% for names in names %}
-      <li><a href="{{ url_for('player',pid='f324') }}">{{names}}</a></li>
+    {% for player in players %}
+      <li><a href="{{ url_for('player',pid=player['id']) }}">{{player['name']}}</a></li>
     {% endfor %}
   </ul>
 

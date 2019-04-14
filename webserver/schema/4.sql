@@ -4,5 +4,5 @@ winner_aces, winner_double_faults, winner_first_serves_in, winner_first_serves_t
 FROM 
 (single_match 
 	INNER JOIN players ON single_match.winner_id = players.id)
-	INNER JOIN matches ON matches.match_id = single_matches.mid
+	INNER JOIN matches ON matches.match_id = single_match.mid
 WHERE players.id = "n409" LIMIT 10;

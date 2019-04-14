@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Welcome To Tennis Stat!</h2>
+<h3>This is the tournaments page.</h3>
+<br>
+<h3>Grand Slams</h3>
+<p>The Grand Slam tournaments, also called majors, are the four most important annual tennis events. They offer the most ranking points, prize money, public and media attention, the greatest strength and size of field, and greater number of "best of" sets for men. The Grand Slam itinerary consists of the Australian Open in mid January, the French Open around late May through early June, Wimbledon in June-July, and the US Open in August-September. Each tournament is played over a two-week period. The Australian and United States tournaments are played on hard courts,[a] the French on clay, and Wimbledon on grass. </p>
+
+<ul>
+    {% for gs in gss%}
+    <li><a href="{{ '/tournaments/{}'.format(gs['tid']) }}">{{gs['name']}}</a></li>
+    {% endfor %}
+</ul>
+<br>
+<h3>ATP Tour Masters 1000</h3>
+<p>The ATP Tour Masters 1000 tournaments (previously known as the ATP World Tour Masters 1000 tournaments, ATP Masters Series, Tennis Masters Series, ATP Super 9, and ATP Championship Series, Single-Week) are the third highest tier of annual men's tennis tournament after the four Grand Slam tournaments and the ATP Finals.</p>
+<ul>
+    {% for atp_master in atp_masters%}
+    <li><a href="{{ '/tournaments/{}'.format(atp_master['tid'])}}">{{atp_master['name']}}</a></li>
+    {% endfor %}
+</ul>
+<!--<h3> This is the end of my child template</h3>-->
+{% endblock %}

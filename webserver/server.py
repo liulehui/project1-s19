@@ -166,22 +166,53 @@ def add():
 #     this_is_never_executed()
 
 
-@app.route("/matches")
-def matches():
-    return render_template(
-        'matches.html', my_string="Wheeeee!",
-        title="matches",
+@app.route("/tournaments")
+def tournaments():
+        # select all the grand slams
+        query ='select distinct name, tournament_id as tid from tournament where series_id  = 1'
+        cursor = g.conn.execute(query)
+        gss = []
+        for result in cursor:
+            gs = {'name': result['name'],'tid': result['tid']}
+            gss.append(gs)
+        cursor.close()
 
-        names=['Federer', 'Nadal', 'Lehui', 'Djokovic', 'Murray', \
-               'Wawrinka', 'Coric', 'del Potro', 'Cilic', 'Dimitrov', 'Thiem', 'Sock'])
+        query = 'select distinct name, tournament_id as tid from tournament where series_id = 2 and start_year = 2016'
+        cursor = g.conn.execute(query)
+        atp_masters = []
+        for result in cursor:
+            atp_master = {'name': result['name'], 'tid': result['tid']}
+            atp_masters.append(atp_master)
+
+        cursor.close()
+        print(gss)
+        print(atp_masters)
+        return render_template(
+        'tournaments.html',
+        title="tournaments",
+        gss = gss,atp_masters = atp_masters)
 
 
-# @app.route("")
+@app.route("/tournaments/<int:tid>")
+def tournament(tid):
+    return render_template('tournament.html',title = tid)
 
 @app.route("/players")
 def players():
+    query = """with tmp as (
+select date, pid, score,rank() over (partition by date order by score desc) as rank from history_score)
+
+select distinct p.id, p.first_name||' '||p.last_name as name from players as p
+join tmp on tmp.pid = p.id
+where rank < 10"""
+    cursor = g.conn.execute(query)
+    top10_players = []
+    for result in cursor:
+        print(result)
+        top10_players.append(result)
+
     return render_template('players.html', title='players',
-                           names=['Roger'])
+                           players = top10_players)
 
 
 @app.route("/players/<string:pid>")
@@ -191,14 +222,14 @@ def player(pid):
 
     cursor = g.conn.execute("""
     select p.last_name,p.first_name,p.birthday,p.height,p.weight,p.nationality,p.start_pro,
-m.year,m.duration,m.level,m.winner_sets_won,m.loser_sets_won,t.name as t_name,lp.last_name ||' '||lp.first_name as loser_name
+m.year,m.duration,m.level,m.winner_sets_won,m.loser_sets_won,t.name as t_name,lp.first_name ||' '||lp.last_name as loser_name
 from players as p
 join single_match as s on p.id = s.winner_id
 join matches as m on m.match_id = s.mid
 join players as lp on lp.id = s.losers_id
-join tournament as t on m.t_id = t.tournament_id
+join tournament as t on m.t_id = t.tournament_id and m.year = t.start_year
 where p.id = {}
-order by m.year DESC
+order by m.year DESC, m.t_id ASC
 limit 1;""".format(pid))
 
     result = cursor.first()

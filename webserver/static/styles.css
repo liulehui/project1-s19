@@ -24,3 +24,9 @@ font-size: 12px;
 font-family: Verdana;
 font-weight: bold;
 }
+
+.line {
+  fill: none;
+  stroke: red;
+  stroke-width: 1.5px;
+}

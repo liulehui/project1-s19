@@ -1,78 +1,84 @@
 {% from "marco.html" import nav_link with context %}
-<html>
-  <head>
+<html lang = 'en'>
+<head>
+    {% block head %}
     <title>{{title}}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
-      <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
-    <style type="text/css">
-      .container {
-        max-width: 500px;
-        padding-top: 100px;
-      }
-      h2 {color: red;}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    {% endblock %}
+    <!--<style type="text/css">-->
+    <!--.container {-->
+    <!--max-width: 800px;-->
+    <!--padding-top: 100px;-->
+    <!--}-->
+    <!--h2 {color: red;}-->
 
-    </style>
-  </head>
-  <body>
-  <nav class="navbar navbar-inverse" role="navigation">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="/">Tennis!</a>
-    </div>
-
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        <ul class="nav navbar-nav">
-  {{ nav_link('players', 'Players') }}
-  {{ nav_link('ranking', 'Rankings') }}
-  {{ nav_link('matches', 'Matches') }}
-</ul>
-      </ul>
-      <form class="navbar-form navbar-left" role="search">
-        <div class="form-group">
-          <input type="text" class="form-control" placeholder="Search">
+    <!--</style>-->
+</head>
+<body>
+<!--{% import "marco.html" as macro %}-->
+<nav class="navbar navbar-inverse" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Tennis!</a>
         </div>
-        <button type="submit" class="btn btn-default">Submit</button>
-      </form>
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="#">Link</a></li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-          <ul class="dropdown-menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
-            <li class="divider"></li>
-            <li><a href="#">Separated link</a></li>
-          </ul>
-        </li>
-      </ul>
-    </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
-</nav>
-    <div class="container">
-      <!--<h2>This is part of my base template</h2>-->
-      <br>
-      {% block content %}{% endblock %}
-      <br>
-      <!--<h2>This is part of my base template</h2>-->
-    </div>
-  <footer id = 'footer'>
-    <div class="footer container">
-  {% block footer %}
-    &copy; Copyright 2019 by Lehui Liu, Feng Fan
-  {% endblock %}
-</div>
-  </footer>
 
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-  </body>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <ul class="nav navbar-nav">
+                    {{ nav_link('players', 'Players') }}
+                    {{ nav_link('ranking', 'Rankings') }}
+                    {{ nav_link('matches', 'Matches') }}
+                </ul>
+            </ul>
+            <form class="navbar-form navbar-left" role="search">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Search">
+                </div>
+                <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">Link</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<div class="container">
+    <!--<h2>This is part of my base template</h2>-->
+    <!--<br>-->
+    <div class = 'content'>{% block content %}{% endblock %}</div>
+    <!--<br>-->
+    <!--<h2>This is part of my base template</h2>-->
+</div>
+
+<footer id = 'footer'>
+    <div class="footer container">
+        {% block footer %}
+        &copy; Copyright 2019 by Lehui Liu, Feng Fan
+        {% endblock %}
+    </div>
+</footer>
+
+{% block script %}
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+{% endblock %}
+</body>
 </html>

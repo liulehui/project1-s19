@@ -1,0 +1,2 @@
+//Show points won vs. points total from players' won games (Can be used for graphing with a stacked bar chart since the sum of first 2 equals the third)
+SELECT winner_total_points_won, loser_total_points_won, winner_total_points_total FROM (single_match INNER JOIN players ON single_match.winner_id = players.id) INNER JOIN matches ON matches.match_id = single_match.mid WHERE players.id = \'n409\' LIMIT 10;

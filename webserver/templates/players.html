@@ -1,12 +1,10 @@
 {% extends "layout.html" %}
 {% block content %}
-  <h2> Welcome To Tennis Stat!</h2>
-  <h3>This is the players page.</h3>
-  <br>
-  <p>Loop through the names:</p>
+  <h2>Players Page</h2>
+
   <ul>
     {% for names in names %}
-    <li>{{names}}</li>
+      <li><a href="{{ url_for('player',pid='f324') }}">{{names}}</a></li>
     {% endfor %}
   </ul>
 

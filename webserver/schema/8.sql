@@ -1,4 +1,5 @@
 //Count of GS champions by player's ID
-SELECT DISTINCT COUNT(tournament_id)
-FROM 
-tournament INNER JOIN players ON tournament.single_winner_id = players.id WHERE tournament.series_id = 1;
+with tmp as (
+select pid, rank() over (order by score DESC) as rank from history_score)
+
+select players.id, first_name||' '||last_name as name, rank from players join tmp on tmp.pid = players.id;

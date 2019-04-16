@@ -280,6 +280,11 @@ order by m.year DESC, m.t_id ASC
 limit 1;""".format(pid))
 
     result = cursor.first()
+    print(result)
+    if result is None:
+        print("Whoops, sorry we do not have him in the database yet.")
+        return redirect("/")
+
     last_name = result['last_name']
     first_name = result['first_name']
     birthday = result['birthday']
@@ -347,6 +352,21 @@ INNER JOIN history_score ON players.id = history_score.pid WHERE history_score.p
     title['ATP_Masters'] = result['count_master']
     cursor.close()
 
+    cmd = """
+with tmp as
+(select pid,max(date) from history_score group by pid),
+
+tmp1 as (
+select tmp.pid,first_name||' '||last_name as name ,tmp.max,score,rank() over (order by score DESC) from history_score, tmp, players
+where history_score.pid = tmp.pid
+and tmp.pid = players.id
+and history_score.date = tmp.max)
+
+select name, rank from tmp1 where pid = {}""".format(pid)
+    cursor = g.conn.execute(cmd)
+    result = cursor.first()
+    recent_rank = result['rank']
+
     return render_template(
         'player.html',
         title=pid,
@@ -355,7 +375,7 @@ INNER JOIN history_score ON players.id = history_score.pid WHERE history_score.p
         history_data=history_data,
         min_score=min_score,
         max_score=max_score,
-        titles = title)
+        titles = title,rank = recent_rank)
 
 
 @app.route("/ranking")

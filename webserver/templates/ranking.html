@@ -12,7 +12,7 @@
     </thead>
     {% for item in top_10 %}
     <TR>
-        <TD class="name">{{item.name}}</TD>
+        <TD class="name"><a href="{{ url_for('player',pid=item['pid']) }}">{{item['name']}}</a></TD>
         <TD class="score">{{item.score}}</TD>
         <TD class="ranking">{{item.rank}}</TD>
     </TR>

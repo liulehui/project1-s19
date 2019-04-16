@@ -103,60 +103,81 @@ def teardown_request(exception):
 #
 @app.route('/')
 def index():
-    """
-  request is a special object that Flask provides to access web request information:
-
-  request.method:   "GET" or "POST"
-  request.form:     if the browser submitted a form, this contains the data in the form
-  request.args:     dictionary of URL arguments e.g., {a:1, b:2} for http://localhost?a=1&b=2
-
-  See its API: http://flask.pocoo.org/docs/0.10/api/#incoming-request-data
-  """
-
-    # DEBUG: this is debugging code to see what request looks like
     print(request.args)
-
-    #
-    # example of a database query
-    #
-    # cursor = g.conn.execute("SELECT name FROM test")
-    cursor = g.conn.execute("select last_name FROM players")
-    names = []
+    query = 'select distinct name, tournament_id as tid from tournament where series_id  = 1'
+    cursor = g.conn.execute(query)
+    gss = []
     for result in cursor:
-        names.append(result['last_name'])  # can also be accessed using result[0]
+        gs = {'name': result['name'], 'tid': result['tid']}
+        gss.append(gs)
     cursor.close()
 
-    #
-    context = dict(data=names)
+    query = 'select distinct name, tournament_id as tid from tournament where series_id = 2 and start_year = 2016'
+    cursor = g.conn.execute(query)
+    atp_masters = []
+    for result in cursor:
+        atp_master = {'name': result['name'], 'tid': result['tid']}
+        atp_masters.append(atp_master)
 
-    #
-    # render_template looks in the templates/ folder for files.
-    # for example, the below file reads template/index.html
-    #
-    return render_template("introduction.html", names=names, title='Landing Page')
+    cursor.close()
+
+    # print(gss)
+    # print(atp_masters)
+
+    query = """with tmp as (
+    select date, pid, score,rank() over (partition by date order by score desc) as rank from history_score)
+
+    select distinct p.id, p.first_name||' '||p.last_name as name from players as p
+    join tmp on tmp.pid = p.id
+    where rank < 10"""
+    cursor = g.conn.execute(query)
+    top10_players = []
+    for result in cursor:
+        # print(result)
+        top10_players.append(result)
+    cursor.close()
+
+    return render_template("introduction.html", gss=gss, atp_masters=atp_masters, players=top10_players,
+                           title='Landing Page')
+@app.route("/queryplayer", methods=['POST'])
+def queryplayers():
+    print(request.form)
+    name = request.form['name']
+    print(name)
+    print(type(name))
+    name = name.lower()
 
 
+    sql_query = """select id, first_name||' '||last_name as name from players 
+    where LOWER(first_name) like '%%{}%%' or LOWER(last_name) like '%%{}%%';""".format(name,name)
+
+    print(sql_query)
+
+    cursor = g.conn.execute(sql_query)
+    similar_players = []
+    for result in cursor:
+        print(result)
+        similar_player = {'pid': result['id'], 'name': result['name']}
+        similar_players.append(similar_player)
+    cursor.close()
+    return render_template(
+        'queryplayer.html',
+        title="ranking",
+        players=similar_players)
 #
-# This is an example of a different path.  You can see it at
-# 
-#     localhost:8111/another
-#
-# notice that the function name is another() rather than index()
-# the functions for each app.route needs to have different names
-#
-@app.route('/another')
-def another():
-    return render_template("anotherfile.html")
+# @app.route('/another')
+# def another():
+#     return render_template("anotherfile.html")
 
 
 # Example of adding new data to the database
-@app.route('/add', methods=['POST'])
-def add():
-    name = request.form['name']
-    print(name)
-    cmd = 'INSERT INTO test(name) VALUES (:name1), (:name2)';
-    g.conn.execute(text(cmd), name1=name, name2=name);
-    return redirect('/')
+# @app.route('/add', methods=['POST'])
+# def add():
+#     name = request.form['name']
+#     print(name)
+#     cmd = 'INSERT INTO test(name) VALUES (:name1), (:name2)';
+#     g.conn.execute(text(cmd), name1=name, name2=name);
+#     return redirect('/')
 
 
 #
@@ -168,34 +189,60 @@ def add():
 
 @app.route("/tournaments")
 def tournaments():
-        # select all the grand slams
-        query ='select distinct name, tournament_id as tid from tournament where series_id  = 1'
-        cursor = g.conn.execute(query)
-        gss = []
-        for result in cursor:
-            gs = {'name': result['name'],'tid': result['tid']}
-            gss.append(gs)
-        cursor.close()
+    # select all the grand slams
+    query = 'select distinct name, tournament_id as tid from tournament where series_id  = 1'
+    cursor = g.conn.execute(query)
+    gss = []
+    for result in cursor:
+        gs = {'name': result['name'], 'tid': result['tid']}
+        gss.append(gs)
+    cursor.close()
 
-        query = 'select distinct name, tournament_id as tid from tournament where series_id = 2 and start_year = 2016'
-        cursor = g.conn.execute(query)
-        atp_masters = []
-        for result in cursor:
-            atp_master = {'name': result['name'], 'tid': result['tid']}
-            atp_masters.append(atp_master)
+    query = 'select distinct name, tournament_id as tid from tournament where series_id = 2 and start_year = 2016'
+    cursor = g.conn.execute(query)
+    atp_masters = []
+    for result in cursor:
+        atp_master = {'name': result['name'], 'tid': result['tid']}
+        atp_masters.append(atp_master)
 
-        cursor.close()
-        print(gss)
-        print(atp_masters)
-        return render_template(
+    cursor.close()
+    print(gss)
+    print(atp_masters)
+    return render_template(
         'tournaments.html',
         title="tournaments",
-        gss = gss,atp_masters = atp_masters)
+        gss=gss, atp_masters=atp_masters)
 
 
 @app.route("/tournaments/<int:tid>")
 def tournament(tid):
-    return render_template('tournament.html',title = tid)
+    tid = tid
+    cmd = """
+    SELECT distinct name, surface FROM tournament INNER JOIN matches ON tournament.tournament_id = matches.t_id 
+    WHERE tournament.tournament_id = {} and start_year = 2016""".format(tid)
+    cursor = g.conn.execute(cmd)
+    result = cursor.first()
+    name = result['name']
+    surface = result['surface']
+    cursor.close()
+
+    # past champions
+    past_champions = []
+    cmd = """SELECT players.id,first_name||' '||last_name as name, COUNT (start_year) as count
+FROM 
+tournament INNER JOIN players ON tournament.singer_winner_id = players.id
+WHERE tournament.tournament_id = {}
+group by players.id,first_name,last_name
+order by count desc;""".format(tid)
+
+    cursor = g.conn.execute(cmd)
+    for result in cursor:
+        past_champion = {'pid': result['id'],'name': result['name'], 'count': result['count']}
+        past_champions.append(past_champion)
+    cursor.close()
+    print(past_champions)
+    return render_template('tournament.html', title=tid, name = name, surface = surface, past_champions = past_champions)
+
 
 @app.route("/players")
 def players():
@@ -210,9 +257,9 @@ where rank < 10"""
     for result in cursor:
         print(result)
         top10_players.append(result)
-
+    cursor.close()
     return render_template('players.html', title='players',
-                           players = top10_players)
+                           players=top10_players)
 
 
 @app.route("/players/<string:pid>")
@@ -274,13 +321,31 @@ INNER JOIN history_score ON players.id = history_score.pid WHERE history_score.p
     print(df.shape)
 
     min_score, max_score = df['score'].min(), df['score'].max()
-    print(min_score,max_score)
+    print(min_score, max_score)
     chart_data = df.to_dict(orient='records')
     print(chart_data)
-    # chart_data = json.dumps(chart_data, indent=2)
     history_data = {'chart_data': chart_data}
 
     print(history_data)
+    cursor.close()
+
+    # title and champion
+    title = {'Grand_Slams':0,'ATP_Masters':0}
+    cmd = """SELECT DISTINCT COUNT(tournament_id) as count_gs FROM tournament 
+    INNER JOIN players ON tournament.singer_winner_id = players.id 
+    WHERE tournament.series_id = 1 and players.id = {} """.format(pid)
+    cursor = g.conn.execute(cmd)
+    result = cursor.first()
+    title['Grand_Slams'] = result['count_gs']
+    cursor.close()
+
+    cmd = """SELECT DISTINCT COUNT(tournament_id) as count_master FROM tournament 
+    INNER JOIN players ON tournament.singer_winner_id = players.id 
+    WHERE tournament.series_id = 2 and players.id = {}""".format(pid)
+    cursor = g.conn.execute(cmd)
+    result = cursor.first()
+    title['ATP_Masters'] = result['count_master']
+    cursor.close()
 
     return render_template(
         'player.html',
@@ -288,16 +353,16 @@ INNER JOIN history_score ON players.id = history_score.pid WHERE history_score.p
         bioinfo=bioinfo,
         recent=recent,
         history_data=history_data,
-        min_score = min_score,
-        max_score = max_score
-    )
+        min_score=min_score,
+        max_score=max_score,
+        titles = title)
 
 
 @app.route("/ranking")
 def ranking():
     sql_query = """with tmp as
 (select pid,max(date) from history_score group by pid)
-select first_name||' '||last_name as name ,tmp.max,score,rank() over (order by score DESC) from history_score, tmp, players
+select tmp.pid as id,first_name||' '||last_name as name ,tmp.max,score,rank() over (order by score DESC) from history_score, tmp, players
 where history_score.pid = tmp.pid
 and tmp.pid = players.id
 and history_score.date = tmp.max
@@ -307,7 +372,7 @@ limit 10;"""
     # find the top 10 players on the ranking board
     top_10 = []
     for result in cursor:
-        player = {'name': result['name'], 'score': result['score'], 'rank': result['rank']}
+        player = {'pid': result['id'], 'name': result['name'], 'score': result['score'], 'rank': result['rank']}
         top_10.append(player)
 
     cursor.close()

@@ -25,8 +25,61 @@ font-family: Verdana;
 font-weight: bold;
 }
 
+/*Title Table CSS*/
+/* Table Head */
+#title thead th {
+background-color: rgb(81, 130, 187);
+color: #fff;
+border-bottom-width: 0;
+}
+
+/* Column Style */
+#title td {
+color: #000;
+}
+/* Heading and Column Style */
+#title tr, #title th {
+border-width: 1px;
+border-style: solid;
+border-color: rgb(81, 130, 187);
+}
+
+/* Padding and font style */
+#title td, #title th {
+padding: 5px 10px;
+font-size: 12px;
+font-family: Verdana;
+font-weight: bold;
+}
 .line {
   fill: none;
   stroke: red;
   stroke-width: 1.5px;
+}
+
+/*Title Table CSS*/
+/* Table Head */
+#past thead th {
+background-color: rgb(81, 130, 187);
+color: #fff;
+border-bottom-width: 0;
+}
+
+/* Column Style */
+#past td {
+color: #000;
+}
+/* Heading and Column Style */
+#past tr, #past th {
+border-width: 1px;
+border-style: solid;
+border-color: rgb(81, 130, 187);
+}
+
+/* Padding and font style */
+#past td, #past th {
+padding: 5px 10px;
+font-size: 12px;
+font-family: Verdana;
+font-weight: bold;
 }

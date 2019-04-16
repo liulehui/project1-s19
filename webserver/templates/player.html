@@ -14,8 +14,22 @@
     <p>score:       {{recent['score']}}</p>
     <p>Duration:        {{recent['duration']}} minutes</p>
 </div>
+
+<h3>Titles:</h3>
+<table id = 'title'>
+    <thead>
+    <th>Grand Slams</th>
+    <th>ATP Masters</th>
+    </thead>
+    <TR>
+        <TD class="gs">{{titles['Grand_Slams']}}</TD>
+        <TD class="master">{{titles['ATP_Masters']}}</TD>
+    </TR>
+</table>
+
 <div class = 'historyscore'>
-    <svg width="400" height="180" color="blue"></svg>
+    <h3>History Score Time Series</h3>
+    <svg width="500" height="280" class = 'historysvg'></svg>
 </div>
 <!--<h3> This is the end of my child template</h3>-->
 {% endblock %}
@@ -25,7 +39,7 @@
 <script>
 let min_score = {{min_score}} - 1000
 let max_score = {{max_score}} + 1000
-var svg = d3.select("svg");
+var svg = d3.select(".historysvg");
 var margin = {top: 20, right: 50, bottom: 30, left: 50};
 var width =  + svg.attr("width") - margin.left - margin.right;
 var height = +svg.attr("height") - margin.top - margin.bottom;

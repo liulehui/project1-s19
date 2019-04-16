@@ -2,19 +2,33 @@
 {% block content %}
   <h2> Welcome To Tennis Stat!</h2>
   <br>
-  <p>My string: {{names}}</p>
-  <p>Value from the list: {{names[3]}}</p>
-  <p>In our site, you can click the navigation bar up and select the player.</p>
-  <p>You can click to view the Players' data, the current rankings and related stats in a specific tennis matches. </p>
-  <p><a href="/players">Go to the players page</a></p>
-  <p><a href="/ranking">Go to the ranking page</a></p>
-  <p><a href="/matches">Go to the matches page</a></p>
-  <p>Loop through the list:</p>
+
+<h3>Popular Players</h3>
+<p>Click the links below to see their data! </p>
+<p>If your favorite player not in it, you can also type in the players' name here!</p>
+<form method="POST" action="/queryplayer">
+    <p>Type player's name: <input type="text" name="name"><input type="submit" value="Go"></p>
+</form>
   <ul>
-    {% for names in names %}
-    <li>{{names}}</li>
+    {% for player in players %}
+      <li><a href="{{ url_for('player',pid=player['id']) }}">{{player['name']}}</a></li>
     {% endfor %}
   </ul>
-
-  <!--<h3> This is the end of my child template</h3>-->
+<br>
+<h3>ATP Tour</h3>
+<p>The ATP Tour comprises ATP World Tour Masters 1000, ATP World Tour 500 series, and ATP World Tour 250 series. The ATP also oversees the ATP Challenger Tour, a level below the ATP World Tour, and the ATP Champions Tour for seniors. Grand Slam tournaments, a small portion of the Olympic tennis tournament, the Davis Cup, the Hopman Cup and the introductory level Futures tournaments do not fall under the auspices of the ATP, but are overseen by the ITF instead and the International Olympic Committee (IOC) for the Olympics. In these events, however, ATP ranking points are awarded, with the exception of the Olympics and Hopman Cup. The four-week ITF Satellite tournaments were discontinued in 2007.</p>
+<h4>Grand Slams</h4>
+<ul>
+    {% for gs in gss%}
+    <li><a href="{{ '/tournaments/{}'.format(gs['tid']) }}">{{gs['name']}}</a></li>
+    {% endfor %}
+</ul>
+<br>
+<h4>ATP Tour Masters 1000</h4>
+<p>The ATP Tour Masters 1000 tournaments (previously known as the ATP World Tour Masters 1000 tournaments, ATP Masters Series, Tennis Masters Series, ATP Super 9, and ATP Championship Series, Single-Week) are the third highest tier of annual men's tennis tournament after the four Grand Slam tournaments and the ATP Finals.</p>
+<ul>
+    {% for atp_master in atp_masters%}
+    <li><a href="{{ '/tournaments/{}'.format(atp_master['tid'])}}">{{atp_master['name']}}</a></li>
+    {% endfor %}
+</ul>
 {% endblock %}

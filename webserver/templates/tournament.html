@@ -1,7 +1,35 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class = 'tournament'>
-    <h2>This is the single tournament page.</h2>
-
+    <h1>{{name}}</h1>
+    <h3>Surface: {{surface}}</h3>
 </div>
+
+<!--<div class = 'duration'>-->
+    <!--<h3>Histogram match duration is this tournament</h3>-->
+    <!--<svg width="500" height="280" class = 'duration'></svg>-->
+<!--</div>-->
+
+<div>
+    <h3>Past Champions:</h3>
+<table id = 'past'>
+    <thead>
+    <th>Name</th>
+    <th>Number he won:</th>
+    </thead>
+    {% for player in past_champions %}
+    <TR>
+        <TD class="name"><a href="{{ url_for('player',pid=player['pid']) }}">{{player['name']}}</a></TD>
+        <TD class="count">{{player.count}}</TD>
+    </TR>
+    {% endfor %}
+</table>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script>
+var svg = d3.select(".duration");
+</script>
 {% endblock %}
